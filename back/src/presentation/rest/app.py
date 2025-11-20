@@ -15,6 +15,7 @@ from app.usecase.errors import (
 )
 from infra.utils.config import load_config
 from presentation.rest.middleware.timeout import TimeoutMiddleware
+from presentation.rest.router.account import router as account_router
 
 cfg = load_config()
 
@@ -55,8 +56,7 @@ app.add_middleware(
 # --- Routers ---
 
 v1_router = APIRouter(prefix="/api/v1")
-
-app.include_router(v1_router)
+v1_router.include_router(account_router)
 
 app.include_router(v1_router)
 

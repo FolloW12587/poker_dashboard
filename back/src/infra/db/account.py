@@ -1,3 +1,4 @@
+from typing import Sequence
 from uuid import UUID
 
 from sqlalchemy import select
@@ -9,6 +10,11 @@ from domain.entity.account import Account
 class AccountRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    async def get_all(self) -> Sequence[Account]:
+        result = await self.session.execute(select(Account).order_by(Account.name))
+
+        return result.scalars().all()
 
     async def get_by_id(self, user_id: UUID) -> Account | None:
         stmt = select(Account).where(Account.id == user_id).limit(1)

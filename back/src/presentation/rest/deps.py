@@ -33,8 +33,18 @@ async def get_db(config: ConfigDep) -> AsyncGenerator[AsyncSession, None]:
 DbSessionDep = Annotated[AsyncSession, Depends(get_db)]
 
 
-def get_user_repository(db_session: DbSessionDep) -> AccountRepository:
+def get_account_repository(db_session: DbSessionDep) -> AccountRepository:
     return AccountRepository(db_session)
 
 
-UserRepDep = Annotated[AccountRepository, Depends(get_user_repository)]
+AccountRepDep = Annotated[AccountRepository, Depends(get_account_repository)]
+
+
+# --- UseCase ---
+
+
+def get_account_usecase(account_repo: AccountRepDep):
+    return AccountUseCase(account_repo)
+
+
+AccountUseCaseDep = Annotated[AccountUseCase, Depends(get_account_usecase)]

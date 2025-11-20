@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "aiosqlite>=0.21.0",
     "alembic>=1.17.2",
     "asgi-correlation-id>=4.3.4",
     "fastapi>=0.121.3",
