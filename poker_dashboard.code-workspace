@@ -1,0 +1,47 @@
+{
+    "folders": [
+        {
+            "name": "back",
+            "path": "./back"
+        },
+        {
+            "name": "front",
+            "path": "./front"
+        },
+        {
+            "name": "root",
+            "path": "./"
+        }
+    ],
+    "settings": {
+        // General
+        "files.exclude": {
+            "**/__pycache__": true,
+            // exclude folders from `root` folder
+            "back": true,
+            "front": true,
+        },
+        "search.exclude": {
+            "**/__pycache__": true,
+            "**/node_modules": true
+        },
+        // Backend
+        "[python]": {
+            "editor.defaultFormatter": "ms-python.black-formatter",
+            "editor.formatOnSave": true
+        },
+        // Frontend
+        "[typescript]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
+            "editor.formatOnSave": true
+        },
+        "[typescriptreact]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
+            "editor.formatOnSave": true
+        },
+        "python.analysis.diagnosticMode": "workspace",
+        "python.analysis.typeCheckingMode": "basic",
+        "pylint.cwd": "${workspaceFolder}",
+        "pylint.enabled": false,
+    },
+}
