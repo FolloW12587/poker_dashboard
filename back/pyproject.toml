@@ -1,0 +1,15 @@
+[project]
+name = "back"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic>=1.17.2",
+    "asgi-correlation-id>=4.3.4",
+    "fastapi>=0.121.3",
+    "pydantic>=2.12.4",
+    "pyyaml>=6.0.3",
+    "sqlalchemy[asyncio]>=2.0.44",
+    "uvicorn>=0.38.0",
+]
