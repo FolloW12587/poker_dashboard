@@ -4,13 +4,20 @@
 from typing import Annotated, AsyncGenerator
 
 from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.dto.auth import TokenUser
 from app.usecase.account import AccountUseCase
+from app.usecase.auth import AuthUseCase
+from app.usecase.balance_change import BalanceChangeUseCase
 
 from infra.db.conn import DatabaseManager
 from infra.db.account import AccountRepository
+from infra.db.balance_change import BalanceChangeRepository
+from infra.db.user import UserRepository
 from infra.utils.config import Config, load_config
+
 
 # --- Configuration ---
 
@@ -40,6 +47,21 @@ def get_account_repository(db_session: DbSessionDep) -> AccountRepository:
 AccountRepDep = Annotated[AccountRepository, Depends(get_account_repository)]
 
 
+def get_balance_change_repository(db_session: DbSessionDep) -> BalanceChangeRepository:
+    return BalanceChangeRepository(db_session)
+
+
+BalanceChangeRepDep = Annotated[
+    BalanceChangeRepository, Depends(get_balance_change_repository)
+]
+
+
+def get_user_repository(db_session: DbSessionDep) -> UserRepository:
+    return UserRepository(db_session)
+
+
+UserRepositoryDep = Annotated[UserRepository, Depends(get_user_repository)]
+
 # --- UseCase ---
 
 
@@ -48,3 +70,36 @@ def get_account_usecase(account_repo: AccountRepDep):
 
 
 AccountUseCaseDep = Annotated[AccountUseCase, Depends(get_account_usecase)]
+
+
+def get_auth_usecase(cfg: ConfigDep, user_repo: UserRepositoryDep):
+    return AuthUseCase(cfg.auth, user_repo)
+
+
+AuthUseCaseDep = Annotated[AuthUseCase, Depends(get_auth_usecase)]
+
+
+def get_balance_change_usecase(
+    account_repo: AccountRepDep, balance_change_repo: BalanceChangeRepDep
+):
+    return BalanceChangeUseCase(account_repo, balance_change_repo)
+
+
+BalanceChangeUseCaseDep = Annotated[
+    BalanceChangeUseCase, Depends(get_balance_change_usecase)
+]
+
+
+# --- Auth ---
+
+security = HTTPBearer()
+
+
+async def get_current_user(
+    auth_use_case: AuthUseCaseDep,
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+) -> TokenUser:
+    return auth_use_case.get_user_from_token(credentials.credentials)
+
+
+CurrentUserDep = Annotated[TokenUser, Depends(get_current_user)]

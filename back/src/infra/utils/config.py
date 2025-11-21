@@ -24,7 +24,7 @@ class ServerConfig(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
-    dsn: str = "sqlite+aiosqlite:///src/infra/db/db.sqlite3"
+    dsn: str = "sqlite+aiosqlite:///infra/db/db.sqlite3"
     use_pgbouncer: bool = False
 
 
@@ -36,6 +36,8 @@ class ValkeyConfig(BaseModel):
 
 class AuthConfig(BaseModel):
     secret: str = "supersecret"
+    algorithm: str = "HS256"
+    access_token_expires_minutes: int = 60
 
 
 class Config(BaseModel):

@@ -16,22 +16,28 @@ class AccountRepository:
 
         return result.scalars().all()
 
-    async def get_by_id(self, user_id: UUID) -> Account | None:
-        stmt = select(Account).where(Account.id == user_id).limit(1)
+    async def get_by_id(self, account_id: UUID) -> Account | None:
+        stmt = select(Account).where(Account.id == account_id).limit(1)
         result = await self.session.execute(stmt)
 
         return result.scalars().first()
 
-    async def create(self, user: Account) -> Account:
-        self.session.add(user)
+    async def get_by_name(self, account_name: str) -> Account | None:
+        stmt = select(Account).where(Account.name == account_name).limit(1)
+        result = await self.session.execute(stmt)
+
+        return result.scalars().first()
+
+    async def create(self, account: Account) -> Account:
+        self.session.add(account)
         await self.session.flush()
-        await self.session.refresh(user)
+        await self.session.refresh(account)
 
-        return user
+        return account
 
-    async def update(self, user: Account) -> Account:
-        await self.session.merge(user)
+    async def update(self, account: Account) -> Account:
+        await self.session.merge(account)
         await self.session.flush()
-        await self.session.refresh(user)
+        await self.session.refresh(account)
 
-        return user
+        return account
