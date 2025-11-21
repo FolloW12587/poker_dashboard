@@ -10,6 +10,7 @@ dependencies = [
     "asgi-correlation-id>=4.3.4",
     "fastapi>=0.121.3",
     "pydantic>=2.12.4",
+    "python-jose>=3.5.0",
     "pyyaml>=6.0.3",
     "sqlalchemy[asyncio]>=2.0.44",
     "uvicorn>=0.38.0",
