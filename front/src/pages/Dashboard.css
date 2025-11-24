@@ -1,0 +1,29 @@
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.2s, transform 0.1s;
+  min-width: 400px;
+}
+
+.card:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.02);
+}
+
+/* Fade-in анимация */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.4s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
