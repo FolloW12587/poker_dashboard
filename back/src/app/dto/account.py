@@ -8,4 +8,4 @@ class AccountResponse(BaseDTO):
     id: UUID
     name: str
     current_balance: float
-    last_balance_update_at: datetime
+    last_balance_update: datetime

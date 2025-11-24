@@ -1,4 +1,5 @@
 from datetime import datetime
+from sqlalchemy import DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 
 from domain.entity.base import BaseEntity
@@ -9,4 +10,4 @@ class Account(BaseEntity):
 
     name: Mapped[str] = mapped_column(nullable=False, unique=True)
     current_balance: Mapped[float]
-    last_balance_update: Mapped[datetime]
+    last_balance_update: Mapped[datetime] = mapped_column(DateTime(timezone=True))

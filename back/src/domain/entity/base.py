@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import MetaData, func
+from sqlalchemy import DateTime, MetaData, func
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -25,5 +25,5 @@ class BaseEntity(AsyncAttrs, DeclarativeBase):
         sort_order=-9999,
     )
     created_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), sort_order=-9998
+        DateTime(timezone=True), server_default=func.now(), sort_order=-9998
     )

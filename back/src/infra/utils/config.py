@@ -24,7 +24,7 @@ class ServerConfig(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
-    dsn: str = "sqlite+aiosqlite:///infra/db/db.sqlite3"
+    dsn: str = "postgresql+asyncpg://poker:poker@localhost/poker"
     use_pgbouncer: bool = False
 
 
