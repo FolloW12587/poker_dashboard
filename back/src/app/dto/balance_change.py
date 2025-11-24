@@ -19,6 +19,7 @@ class BalanceChangeResponse(BaseDTO):
     account_id: UUID
     state: BalanceStateChange
     balance: float
+    balance_diff: float
 
 
 class BalanceChangeRequest(BaseDTO):

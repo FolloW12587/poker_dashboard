@@ -36,6 +36,12 @@ class AuthUseCase:
 
         return user
 
+    def validate_api_secret(self, secret: str) -> bool:
+        if not self._verify_password(secret, self._cfg.api_secret):
+            raise UnauthorizedError("Invalid token")
+
+        return True
+
     async def register(self, username: str, password: str) -> User:
         if await self.user_repo.get_by_name(username):
             raise InvalidInputError("User with given username already exists")

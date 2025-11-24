@@ -19,3 +19,4 @@ class BalanceChange(BaseEntity):
     account_id: Mapped[UUID]
     state: Mapped[BalanceChangeState] = mapped_column(String)
     balance: Mapped[float]
+    balance_diff: Mapped[float]

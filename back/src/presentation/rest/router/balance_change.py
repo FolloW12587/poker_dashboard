@@ -2,7 +2,11 @@ from uuid import UUID
 from fastapi import APIRouter
 
 from app.dto.balance_change import BalanceChangeResponse, BalanceChangeRequest
-from presentation.rest.deps import BalanceChangeUseCaseDep, CurrentUserDep
+from presentation.rest.deps import (
+    BalanceChangeUseCaseDep,
+    CurrentUserDep,
+    VerifiedApiCallDep,
+)
 
 router = APIRouter(prefix="/balance_change", tags=["balance_change"])
 
@@ -20,6 +24,6 @@ async def get_account_balance_change(
 async def new_balance_change(
     use_case: BalanceChangeUseCaseDep,
     request_dto: BalanceChangeRequest,
-    _: CurrentUserDep,
+    _: VerifiedApiCallDep,
 ) -> BalanceChangeResponse:
     return await use_case.new_balance_update(request_dto)

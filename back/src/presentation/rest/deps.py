@@ -3,9 +3,11 @@
 
 from typing import Annotated, AsyncGenerator
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.requests import Request
+from starlette.status import HTTP_403_FORBIDDEN
 
 from app.dto.auth import TokenUser
 from app.usecase.account import AccountUseCase
@@ -103,3 +105,31 @@ async def get_current_user(
 
 
 CurrentUserDep = Annotated[TokenUser, Depends(get_current_user)]
+
+
+async def get_request_api_key(
+    request: Request,
+) -> str:
+    api_key = request.query_params.get("api_key")
+    if api_key:
+        return api_key
+
+    try:
+        body = await request.json()
+        if isinstance(body, dict) and "api_key" in body:
+            return body["api_key"]
+    except Exception:
+        # тело не JSON — игнорируем
+        pass
+
+    raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Not authenticated")
+
+
+async def verify_api_call(
+    auth_use_case: AuthUseCaseDep,
+    api_key: Annotated[str, Depends(get_request_api_key)],
+) -> bool:
+    return auth_use_case.validate_api_secret(api_key)
+
+
+VerifiedApiCallDep = Annotated[bool, Depends(verify_api_call)]

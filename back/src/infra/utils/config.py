@@ -39,6 +39,10 @@ class AuthConfig(BaseModel):
     algorithm: str = "HS256"
     access_token_expires_minutes: int = 60
 
+    api_secret: str = (
+        "XahagS9FOnMopwVQN0wI7M8e1vLH+EFRRXg3l3iDGjI12whe4ckO8rb/jB43XgGw"  # apisecret
+    )
+
 
 class Config(BaseModel):
     env: str = "local"

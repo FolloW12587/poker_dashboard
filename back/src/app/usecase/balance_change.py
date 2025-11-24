@@ -2,7 +2,6 @@ from datetime import datetime
 from uuid import UUID
 
 from app.dto.balance_change import BalanceChangeResponse, BalanceChangeRequest
-from app.usecase.errors import NotFoundError
 from domain.entity.account import Account
 from domain.entity.balance_change import BalanceChange, BalanceChangeState
 from infra.db.account import AccountRepository
@@ -38,11 +37,21 @@ class BalanceChangeUseCase:
 
             account = await self.account_repository.create(account)
 
+        diff = (
+            0
+            if request_dto.state
+            in [BalanceChangeState.MONEY_RECIEVED, BalanceChangeState.MONEY_WITHDRAW]
+            else request_dto.balance - account.current_balance
+        )
         balance_change = BalanceChange(
             account_id=account.id,
             state=request_dto.state.value,
             balance=request_dto.balance,
+            balance_diff=diff,
         )
 
         balance_change = await self.balance_change_repository.create(balance_change)
+        account.current_balance = request_dto.balance
+        await self.account_repository.update(account)
+
         return BalanceChangeResponse.model_validate(balance_change)
