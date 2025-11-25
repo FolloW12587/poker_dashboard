@@ -16,6 +16,13 @@
   transform: scale(1.02);
 }
 
+.skeleton {
+  background: linear-gradient(-45deg, #333 25%, #444 37%, #333 63%);
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+  height: 14px;
+}
+
 /* Fade-in анимация */
 .fade-in {
   opacity: 0;
@@ -25,5 +32,14 @@
 @keyframes fadeIn {
   to {
     opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -50px 0;
+  }
+  100% {
+    background-position: 50px 0;
   }
 }

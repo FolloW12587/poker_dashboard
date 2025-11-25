@@ -21,9 +21,17 @@ export function getAccounts(): Promise<Account[]> {
   return apiRequest<Account[]>("/accounts", { method: "GET" });
 }
 
-// Получить изменения баланса для конкретного аккаунта
-export function getBalanceChanges(accountId: string): Promise<BalanceChange[]> {
-  return apiRequest<BalanceChange[]>(`/balance_change/${accountId}`, {
-    method: "GET",
-  });
+export function getBalanceChanges(
+  accountId: string,
+  dateFrom: string,
+  dateTo: string
+): Promise<BalanceChange[]> {
+  return apiRequest<BalanceChange[]>(
+    `/balance_change/${accountId}?date_from=${encodeURIComponent(
+      dateFrom
+    )}&date_to=${encodeURIComponent(dateTo)}`,
+    {
+      method: "GET",
+    }
+  );
 }
