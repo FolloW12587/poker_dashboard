@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Sequence
 from uuid import UUID
 
@@ -11,8 +12,15 @@ class BalanceChangeRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_by_account_id(self, account_id: UUID) -> Sequence[BalanceChange]:
+    async def get_by_account_id(
+        self, account_id: UUID, date_from: datetime | None, date_to: datetime | None
+    ) -> Sequence[BalanceChange]:
         stmt = select(BalanceChange).where(BalanceChange.account_id == account_id)
+        if date_from:
+            stmt = stmt.where(BalanceChange.created_at >= date_from)
+        if date_to:
+            stmt = stmt.where(BalanceChange.created_at < date_to)
+
         result = await self.session.execute(stmt)
 
         return result.scalars().all()

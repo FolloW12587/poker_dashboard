@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from app.dto.balance_change import BalanceChangeResponse, BalanceChangeRequest
+from app.dto.balance_change import BalanceChangeResponse, NewBalanceChangeRequest
 from domain.entity.account import Account
 from domain.entity.balance_change import BalanceChange, BalanceChangeState
 from infra.db.account import AccountRepository
@@ -18,14 +18,16 @@ class BalanceChangeUseCase:
         self.balance_change_repository = balance_change_repository
 
     async def get_change_for_account(
-        self, account_id: UUID
+        self, account_id: UUID, date_from: datetime | None, date_to: datetime | None
     ) -> list[BalanceChangeResponse]:
-        changes = await self.balance_change_repository.get_by_account_id(account_id)
+        changes = await self.balance_change_repository.get_by_account_id(
+            account_id, date_from, date_to
+        )
 
         return [BalanceChangeResponse.model_validate(change) for change in changes]
 
     async def new_balance_update(
-        self, request_dto: BalanceChangeRequest
+        self, request_dto: NewBalanceChangeRequest
     ) -> BalanceChangeResponse:
         account = await self.account_repository.get_by_name(request_dto.account_name)
         if not account:

@@ -22,7 +22,7 @@ class BalanceChangeResponse(BaseDTO):
     balance_diff: float
 
 
-class BalanceChangeRequest(BaseDTO):
+class NewBalanceChangeRequest(BaseDTO):
     account_name: str
     state: BalanceStateChange
     balance: float
