@@ -2,25 +2,36 @@ import { useEffect, useState } from "react";
 import { getBalanceChanges, type Account } from "../../api/accounts";
 import { FiChevronRight } from "react-icons/fi";
 import dayjs from "dayjs";
+import "dayjs/locale/ru";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useNavigate } from "react-router";
 
 dayjs.extend(relativeTime);
 
-export default function Card(acc: Account) {
+interface CardProps extends Account {
+  onClick?: () => void;
+  showChevron: boolean;
+}
+
+export default function Card({
+  id,
+  name,
+  current_balance,
+  last_balance_update,
+  onClick,
+  showChevron,
+}: CardProps) {
   const [change, setChange] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     loadChangesForAccount();
   }, []);
 
-  const dateStr = acc.last_balance_update.replace(/\.\d+Z$/, "Z");
+  const dateStr = last_balance_update.replace(/\.\d+Z$/, "Z");
   const date = new Date(dateStr);
   const timeSince = isNaN(date.getTime())
     ? "неизвестно"
-    : dayjs(date).fromNow(); // Используем dayjs для красивого формата
+    : dayjs(date).locale("ru").fromNow(); // Используем dayjs для красивого формата
 
   const colorStyle =
     change == 0
@@ -36,30 +47,20 @@ export default function Card(acc: Account) {
     const isoFrom = dateFrom.toISOString();
     const isoTo = dateTo.toISOString();
 
-    const results = await getBalanceChanges(acc.id, isoFrom, isoTo).then(
-      (list) => {
-        return list.reduce((sum, x) => sum + x.balance_diff, 0);
-      }
-    );
+    const results = await getBalanceChanges(id, isoFrom, isoTo).then((list) => {
+      return list.reduce((sum, x) => sum + x.balance_diff, 0);
+    });
 
     setChange(results);
     setLoading(false);
   }
 
-  const handleClick = (id: string) => {
-    navigate(`/accounts/${id}`);
-  };
-
   return (
-    <div
-      key={acc.id}
-      className="card fade-in"
-      onClick={() => handleClick(acc.id)}
-    >
-      <div style={styles.left}>{acc.name}</div>
+    <div key={id} className="card fade-in" onClick={onClick}>
+      <div style={styles.left}>{name}</div>
       <div style={styles.right}>
         <div style={styles.balanceWrapper}>
-          <div style={styles.balance}>{acc.current_balance}$</div>
+          <div style={styles.balance}>{current_balance}$</div>
           <div style={styles.lastUpdate}>{timeSince}</div>
         </div>
         <div style={styles.changeBox}>
@@ -71,9 +72,9 @@ export default function Card(acc: Account) {
               {change.toFixed(2)}$
             </div>
           )}
-          <div style={styles.lastUpdate}>last 24h</div>
+          <div style={styles.lastUpdate}>за 24ч</div>
         </div>
-        <FiChevronRight style={styles.icon} />
+        {showChevron ? <FiChevronRight style={styles.icon} /> : ""}
       </div>
     </div>
   );
