@@ -1,8 +1,8 @@
-import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getAccounts, type Account } from "../../api/accounts";
 import "./Dashboard.css"; // Для анимации fade-in
 import Card from "./Card";
+import AccountPage from "../account/Account";
 
 export default function Dashboard() {
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -35,59 +35,35 @@ export default function Dashboard() {
     return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
 
   return (
-    <div style={{ position: "relative" }}>
-      <AnimatePresence mode="sync">
-        {!accountSelected && (
-          <motion.div
-            key="list"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            style={styles.wrapper}
-          >
-            <input
-              type="text"
-              placeholder="Поиск аккаунта"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={styles.search}
-            />
+    <div>
+      {!accountSelected && (
+        <div style={styles.wrapper}>
+          <input
+            type="text"
+            placeholder="Поиск аккаунта"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={styles.search}
+          />
 
-            <div style={styles.list}>
-              {filteredAccounts.map((acc) => (
-                <motion.div key={acc.id} layoutId={acc.id}>
-                  <Card
-                    showChevron={true}
-                    {...acc}
-                    onClick={() => setAccountSelected(acc)}
-                  />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {accountSelected && (
-          <motion.div
-            key="single"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            // style={{ paddingTop: "40px" }}
-          >
-            {/* ВАЖНО: тот же layoutId */}
-            <motion.div layoutId={accountSelected.id}>
+          <div style={styles.list}>
+            {filteredAccounts.map((acc) => (
               <Card
-                showChevron={false}
-                {...accountSelected}
-                onClick={() => {}}
+                {...acc}
+                onClick={() => setAccountSelected(acc)}
+                key={acc.id}
               />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {accountSelected && (
+        <AccountPage
+          {...accountSelected}
+          onBackClick={() => setAccountSelected(null)}
+        ></AccountPage>
+      )}
     </div>
   );
 }

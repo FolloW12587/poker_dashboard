@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import { getBalanceChanges, type Account } from "../../api/accounts";
-import { FiChevronRight } from "react-icons/fi";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { Skeleton } from "antd";
 
 dayjs.extend(relativeTime);
 
 interface CardProps extends Account {
   onClick?: () => void;
-  showChevron: boolean;
 }
 
 export default function Card({
@@ -18,7 +17,6 @@ export default function Card({
   current_balance,
   last_balance_update,
   onClick,
-  showChevron,
 }: CardProps) {
   const [change, setChange] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -27,11 +25,9 @@ export default function Card({
     loadChangesForAccount();
   }, []);
 
-  const dateStr = last_balance_update.replace(/\.\d+Z$/, "Z");
-  const date = new Date(dateStr);
-  const timeSince = isNaN(date.getTime())
-    ? "неизвестно"
-    : dayjs(date).locale("ru").fromNow(); // Используем dayjs для красивого формата
+  // const dateStr = last_balance_update.replace(/\.\d+Z$/, "Z");
+  // const date = new Date(dateStr);
+  const timeSince = dayjs(last_balance_update).locale("ru").fromNow(); // Используем dayjs для красивого формата
 
   const colorStyle =
     change == 0
@@ -65,7 +61,7 @@ export default function Card({
         </div>
         <div style={styles.changeBox}>
           {loading ? (
-            <div className="skeleton" style={styles.skeleton}></div>
+            <Skeleton.Button active />
           ) : (
             <div style={colorStyle}>
               {change >= 0 ? "+" : ""}
@@ -74,7 +70,6 @@ export default function Card({
           )}
           <div style={styles.lastUpdate}>за 24ч</div>
         </div>
-        {showChevron ? <FiChevronRight style={styles.icon} /> : ""}
       </div>
     </div>
   );
@@ -130,12 +125,5 @@ const styles = {
   changeBox: {
     minWidth: 80,
     textAlign: "right",
-  } as React.CSSProperties,
-
-  skeleton: {
-    width: 50,
-    height: 14,
-    marginLeft: "auto",
-    borderRadius: 4,
   } as React.CSSProperties,
 };
