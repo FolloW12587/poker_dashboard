@@ -101,7 +101,7 @@ def run_migrations_online() -> None:
     asyncio.run(run_async_migrations())
 
 
-print("Using DB URL:", config.get_main_option("sqlalchemy.url"))
+# print("Using DB URL:", config.get_main_option("sqlalchemy.url"))
 if context.is_offline_mode():
     run_migrations_offline()
 else:

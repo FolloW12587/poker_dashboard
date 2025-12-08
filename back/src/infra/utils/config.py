@@ -5,7 +5,11 @@ from functools import lru_cache
 import yaml
 from pydantic import BaseModel
 
-CONFIG_PATH = "./config/config.yml"
+CONFIG_PATH = os.path.join(
+    os.path.dirname(__file__), "..", "..", "config", "config.yml"
+)
+CONFIG_PATH = os.path.abspath(CONFIG_PATH)
+# CONFIG_PATH = "./config/config.yml"
 
 
 class LogType(str, Enum):
@@ -49,6 +53,7 @@ class Config(BaseModel):
 
 @lru_cache(maxsize=1)
 def load_config() -> Config:
+    # print(CONFIG_PATH)
     if not os.path.exists(CONFIG_PATH):
         print(f"Config file not found at {CONFIG_PATH}. Using default config.")
 
