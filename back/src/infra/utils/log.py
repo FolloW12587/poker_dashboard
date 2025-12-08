@@ -35,33 +35,61 @@ def setup_logging(cfg: LogConfig) -> None:
             }
         }
         default_formatter = "json"
-    else:  # CONSOLE
+    elif cfg.type == LogType.CONSOLE:  # CONSOLE
         formatters = {
             "console": {
                 "format": CONSOLE_FMT,
             }
         }
         default_formatter = "console"
+    else:  # FILE
+        formatters = {
+            "file": {
+                "format": CONSOLE_FMT,
+            }
+        }
+        default_formatter = "file"
+
+    handlers = {
+        "default": {
+            "formatter": default_formatter,
+            "class": "logging.StreamHandler",
+            "filters": ["correlation_id"],
+            "stream": "ext://sys.stdout",
+        },
+        "access": {
+            "formatter": default_formatter,
+            "class": "logging.StreamHandler",
+            "filters": ["correlation_id"],
+            "stream": "ext://sys.stdout",
+        },
+    }
+    if cfg.type == LogType.FILE:
+        handlers = {
+            "default": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": "logs/app.log",
+                "maxBytes": 10_000_000,
+                "backupCount": 5,
+                "formatter": default_formatter,
+                "filters": ["correlation_id"],
+            },
+            "access": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": "logs/access.log",
+                "maxBytes": 10_000_000,
+                "backupCount": 5,
+                "formatter": default_formatter,
+                "filters": ["correlation_id"],
+            },
+        }
 
     log_config = {
         "version": 1,
         "disable_existing_loggers": False,
         "filters": {**CORRELATION_ID_FILTER},
         "formatters": formatters,
-        "handlers": {
-            "default": {
-                "formatter": default_formatter,
-                "class": "logging.StreamHandler",
-                "filters": ["correlation_id"],
-                "stream": "ext://sys.stdout",
-            },
-            "access": {
-                "formatter": default_formatter,
-                "class": "logging.StreamHandler",
-                "filters": ["correlation_id"],
-                "stream": "ext://sys.stdout",
-            },
-        },
+        "handlers": handlers,
         "loggers": {
             # Application logger
             cfg.name: {

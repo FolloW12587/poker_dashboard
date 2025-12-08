@@ -11,12 +11,13 @@ CONFIG_PATH = "./config/config.yml"
 class LogType(str, Enum):
     JSON = "json"
     CONSOLE = "console"
+    FILE = "file"
 
 
 class LogConfig(BaseModel):
     name: str = "app"
     level: str = "INFO"
-    type: LogType = LogType.CONSOLE
+    type: LogType = LogType.FILE
 
 
 class ServerConfig(BaseModel):
