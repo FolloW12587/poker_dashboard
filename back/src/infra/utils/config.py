@@ -28,12 +28,6 @@ class DatabaseConfig(BaseModel):
     use_pgbouncer: bool = False
 
 
-class ValkeyConfig(BaseModel):
-    address: str = "localhost"
-    port: int = 6379
-    password: str | None = None
-
-
 class AuthConfig(BaseModel):
     secret: str = "supersecret"
     algorithm: str = "HS256"
@@ -49,7 +43,6 @@ class Config(BaseModel):
     log: LogConfig = LogConfig()
     server: ServerConfig = ServerConfig()
     db: DatabaseConfig = DatabaseConfig()
-    valkey: ValkeyConfig = ValkeyConfig()
     auth: AuthConfig = AuthConfig()
 
 
