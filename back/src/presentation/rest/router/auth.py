@@ -18,7 +18,7 @@ async def login(
     return Token(access_token=token)
 
 
-@router.post("/register")
+# @router.post("/register")
 async def register(
     data: LoginRequest,
     auth_use_case: AuthUseCaseDep,
