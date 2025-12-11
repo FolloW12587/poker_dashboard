@@ -1,4 +1,4 @@
-from asyncio import sleep
+# from asyncio import sleep
 from datetime import datetime
 from uuid import UUID
 
@@ -28,7 +28,7 @@ class BalanceChangeUseCase:
         changes = await self.balance_change_repository.get_by_account_id(
             account_id, date_from, date_to
         )
-        await sleep(5)
+        # await sleep(5)
 
         return [BalanceChangeResponse.model_validate(change) for change in changes]
 
