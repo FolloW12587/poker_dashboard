@@ -22,7 +22,7 @@ const CustomBarShape: React.FC<any> = (props) => {
 
 export default function BalanceDiffChart({ changes }: BalanceDiffChartProps) {
   const prepareBalanceDiffChart = () => {
-    const excluded: BalanceChangeState[] = ["money_received", "money_withdraw"];
+    const excluded: BalanceChangeState[] = ["deposit", "withdraw"];
 
     return changes
       .filter((b) => !excluded.includes(b.state))

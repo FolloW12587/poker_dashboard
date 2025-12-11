@@ -56,7 +56,7 @@ class BalanceChangeUseCase:
 
             account = await self.account_repository.create(account)
 
-        diff = request_dto.balance - account.balance
+        diff = round(request_dto.balance - account.balance, 2)
         state = request_dto.state
         if account.is_balance_fixed:
             state = self.__get_state_if_balance_is_fixed(

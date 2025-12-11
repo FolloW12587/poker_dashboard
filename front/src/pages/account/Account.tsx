@@ -40,7 +40,7 @@ const rangePresets: TimeRangePickerProps["presets"] = [
 export default function AccountPage({
   id,
   name,
-  current_balance,
+  balance: current_balance,
   last_balance_update,
   onBackClick,
 }: AccountProps) {

@@ -14,7 +14,7 @@ interface CardProps extends Account {
 export default function Card({
   id,
   name,
-  current_balance,
+  balance: current_balance,
   last_balance_update,
   onClick,
 }: CardProps) {

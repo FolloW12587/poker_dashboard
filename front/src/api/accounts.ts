@@ -3,15 +3,17 @@ import { apiRequest } from "./http";
 export interface Account {
   id: string;
   name: string;
-  current_balance: number;
+  balance: number;
+  is_active: boolean;
   last_balance_update: string; // ISO string
 }
 
 export const BalanceChangeState = {
-  MONEY_REQUEST: "money_request",
-  MONEY_RECEIVED: "money_received",
-  MONEY_WITHDRAW: "money_withdraw",
+  LOCK: "lock",
+  DEPOSIT: "deposit",
+  WITHDRAW: "withdraw",
   UPDATE: "update",
+  SHUTDOWN: "shutdown",
 } as const;
 
 export type BalanceChangeState =
@@ -22,15 +24,17 @@ export interface BalanceChange {
   created_at: string; // ISO string
   account_id: string;
   state: BalanceChangeState;
+  state_raw: BalanceChangeState;
   balance: number;
   balance_diff: number;
 }
 
 export const BalanceChangeStateMapping: Record<BalanceChangeState, string> = {
-  money_request: "Запрос пополнения баланса",
-  money_received: "Пополнение баланса",
-  money_withdraw: "Вывод средств",
+  lock: "Блокировка баланса до следующего изменения",
+  deposit: "Пополнение баланса",
+  withdraw: "Вывод средств",
   update: "Обновление баланса",
+  shutdown: "Выключение и обновление баланса",
 };
 
 // Получить список аккаунтов
