@@ -14,3 +14,4 @@ class Account(BaseEntity):
         default=False, server_default=text("false")
     )
     last_balance_update: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    is_active: Mapped[bool] = mapped_column(default=True, server_default=text("true"))

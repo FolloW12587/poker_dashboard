@@ -10,6 +10,7 @@ class BalanceChangeState(str, Enum):
     DEPOSIT = "deposit"
     WITHDRAW = "withdraw"
     UPDATE = "update"
+    SHUTDOWN = "shutdown"
 
 
 class BalanceChangeResponse(BaseDTO):

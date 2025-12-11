@@ -10,3 +10,4 @@ class AccountResponse(BaseDTO):
     balance: float
     last_balance_update: datetime
     is_balance_fixed: bool
+    is_active: bool

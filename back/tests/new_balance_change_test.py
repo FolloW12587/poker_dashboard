@@ -77,6 +77,7 @@ async def test_balance_change_update(ready_db_session: tuple[AsyncSession, Accou
     await session.refresh(account)
     assert not account.is_balance_fixed
     assert account.balance == dto.balance
+    assert account.is_active
 
 
 @pytest.mark.asyncio
@@ -99,6 +100,7 @@ async def test_balance_change_update_fixed_dep(
 
     await session.refresh(account)
     assert not account.is_balance_fixed
+    assert account.is_active
 
 
 @pytest.mark.asyncio
@@ -108,6 +110,7 @@ async def test_balance_change_update_fixed_same_balance(
     session, account = ready_db_session
 
     usecase = get_usecase(session)
+    # Аккуант активный
     account.is_balance_fixed = True
     account = await usecase.account_repository.update(account)
 
@@ -120,7 +123,21 @@ async def test_balance_change_update_fixed_same_balance(
     assert output.state == BalanceChangeState.UPDATE
 
     await session.refresh(account)
+    # при активном аккаунте фикс должен остаться
     assert account.is_balance_fixed
+    assert account.is_active
+
+    account.is_active = False
+    account = await usecase.account_repository.update(account)
+
+    output = await usecase.new_balance_update(dto)
+    assert output.balance_diff == 0
+    assert output.state == BalanceChangeState.UPDATE
+
+    await session.refresh(account)
+    # при неактивном аккаунте фикс должен сняться
+    assert not account.is_balance_fixed
+    assert account.is_active
 
 
 @pytest.mark.asyncio
@@ -143,6 +160,7 @@ async def test_balance_change_update_fixed_withdraw(
 
     await session.refresh(account)
     assert not account.is_balance_fixed
+    assert account.is_active
 
 
 @pytest.mark.asyncio
@@ -170,6 +188,7 @@ async def test_balance_change_invalid_state(
     await session.refresh(account)
     assert account.balance == 100
     assert not account.is_balance_fixed
+    assert account.is_active
 
 
 @pytest.mark.asyncio
@@ -189,6 +208,7 @@ async def test_balance_change_lock(ready_db_session: tuple[AsyncSession, Account
     await session.refresh(account)
     assert account.is_balance_fixed
     assert account.balance == dto.balance
+    assert account.is_active
 
 
 @pytest.mark.asyncio
@@ -198,6 +218,7 @@ async def test_balance_change_lock_fixed(
     session, account = ready_db_session
 
     usecase = get_usecase(session)
+    # активный аккаунт
     account.is_balance_fixed = True
     account = await usecase.account_repository.update(account)
     # account gained
@@ -212,6 +233,21 @@ async def test_balance_change_lock_fixed(
     await session.refresh(account)
     assert account.is_balance_fixed
     assert account.balance == dto.balance
+    assert account.is_active
+
+    # неактивный аккаунт
+    account.balance = 100
+    account.is_active = False
+    account = await usecase.account_repository.update(account)
+
+    output = await usecase.new_balance_update(dto)
+    assert output.balance_diff == 100
+    assert output.state == BalanceChangeState.DEPOSIT
+
+    await session.refresh(account)
+    assert account.is_balance_fixed
+    assert account.balance == dto.balance
+    assert account.is_active
 
 
 @pytest.mark.asyncio
@@ -220,6 +256,7 @@ async def test_balance_change_lock_fixed_same_balance(
 ):
     session, account = ready_db_session
 
+    # активный аккаунт
     usecase = get_usecase(session)
     account.is_balance_fixed = True
     account = await usecase.account_repository.update(account)
@@ -234,3 +271,121 @@ async def test_balance_change_lock_fixed_same_balance(
 
     await session.refresh(account)
     assert account.is_balance_fixed
+    assert account.is_active
+
+    # неактивный аккаунт
+    usecase = get_usecase(session)
+    account.is_active = False
+    account = await usecase.account_repository.update(account)
+
+    dto = NewBalanceChangeRequest(
+        account_name=account.name, state=BalanceChangeState.LOCK, balance=100
+    )
+
+    output = await usecase.new_balance_update(dto)
+    assert output.balance_diff == 0
+    assert output.state == BalanceChangeState.LOCK
+
+    await session.refresh(account)
+    assert account.is_balance_fixed
+    assert account.is_active
+
+
+@pytest.mark.asyncio
+async def test_balance_change_shutdown(ready_db_session: tuple[AsyncSession, Account]):
+    session, account = ready_db_session
+
+    usecase = get_usecase(session)
+    # account gained
+    dto = NewBalanceChangeRequest(
+        account_name=account.name, state=BalanceChangeState.SHUTDOWN, balance=200
+    )
+
+    output = await usecase.new_balance_update(dto)
+    assert output.balance_diff == 100
+    assert output.state == BalanceChangeState.SHUTDOWN
+
+    await session.refresh(account)
+    assert account.is_balance_fixed
+    assert account.balance == dto.balance
+    assert not account.is_active
+
+
+@pytest.mark.asyncio
+async def test_balance_change_shutdown_fixed(
+    ready_db_session: tuple[AsyncSession, Account],
+):
+    session, account = ready_db_session
+
+    usecase = get_usecase(session)
+    # активный аккаунт
+    account.is_balance_fixed = True
+    account = await usecase.account_repository.update(account)
+    # account gained
+    dto = NewBalanceChangeRequest(
+        account_name=account.name, state=BalanceChangeState.SHUTDOWN, balance=200
+    )
+
+    output = await usecase.new_balance_update(dto)
+    assert output.balance_diff == 100
+    assert output.state == BalanceChangeState.DEPOSIT
+
+    await session.refresh(account)
+    assert account.is_balance_fixed
+    assert account.balance == dto.balance
+    assert not account.is_active
+
+    # неактивный аккаунт
+    account.balance = 100
+    account.is_active = False
+    account = await usecase.account_repository.update(account)
+
+    output = await usecase.new_balance_update(dto)
+    assert output.balance_diff == 100
+    assert output.state == BalanceChangeState.DEPOSIT
+
+    await session.refresh(account)
+    assert account.is_balance_fixed
+    assert account.balance == dto.balance
+    assert not account.is_active
+
+
+@pytest.mark.asyncio
+async def test_balance_change_shutdown_fixed_same_balance(
+    ready_db_session: tuple[AsyncSession, Account],
+):
+    session, account = ready_db_session
+
+    # активный аккаунт
+    usecase = get_usecase(session)
+    account.is_balance_fixed = True
+    account = await usecase.account_repository.update(account)
+
+    dto = NewBalanceChangeRequest(
+        account_name=account.name, state=BalanceChangeState.SHUTDOWN, balance=100
+    )
+
+    output = await usecase.new_balance_update(dto)
+    assert output.balance_diff == 0
+    assert output.state == BalanceChangeState.SHUTDOWN
+
+    await session.refresh(account)
+    assert account.is_balance_fixed
+    assert not account.is_active
+
+    # неактивный аккаунт
+    usecase = get_usecase(session)
+    account.is_active = False
+    account = await usecase.account_repository.update(account)
+
+    dto = NewBalanceChangeRequest(
+        account_name=account.name, state=BalanceChangeState.SHUTDOWN, balance=100
+    )
+
+    output = await usecase.new_balance_update(dto)
+    assert output.balance_diff == 0
+    assert output.state == BalanceChangeState.SHUTDOWN
+
+    await session.refresh(account)
+    assert account.is_balance_fixed
+    assert not account.is_active

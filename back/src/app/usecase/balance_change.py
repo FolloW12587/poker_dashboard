@@ -72,8 +72,9 @@ class BalanceChangeUseCase:
         )
 
         account.balance = request_dto.balance
+        account.is_active = request_dto.state != BalanceChangeState.SHUTDOWN
         # Если статус в списке - фиксируем баланс до следующего обновления
-        if request_dto.state == BalanceChangeState.LOCK:
+        if request_dto.state in [BalanceChangeState.LOCK, BalanceChangeState.SHUTDOWN]:
             account.is_balance_fixed = True
 
         balance_change = await self.balance_change_repository.create(balance_change)
@@ -85,8 +86,13 @@ class BalanceChangeUseCase:
         self, account: Account, diff: float, state_raw: str
     ) -> BalanceChangeState:
         if diff == 0:
+            if not account.is_active:
+                # Лок баланса произошел по причине остановки бота - снимаем фикс
+                account.is_balance_fixed = False
+
+            # Фикс должен остаться, если аккаунт был активный
+
             # Если баланс не изменился - не произошло ни пополнения, ни снятия
-            # фикс должен остаться
             return state_raw  # type: ignore
 
         if state_raw == BalanceChangeState.UPDATE:
