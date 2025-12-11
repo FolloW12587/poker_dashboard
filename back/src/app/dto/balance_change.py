@@ -5,10 +5,10 @@ from uuid import UUID
 from app.dto.base import BaseDTO
 
 
-class BalanceStateChange(str, Enum):
-    MONEY_REQUEST = "money_request"
-    MONEY_RECIEVED = "money_received"
-    MONEY_WITHDRAW = "money_withdraw"
+class BalanceChangeState(str, Enum):
+    LOCK = "lock"
+    DEPOSIT = "deposit"
+    WITHDRAW = "withdraw"
     UPDATE = "update"
 
 
@@ -17,12 +17,13 @@ class BalanceChangeResponse(BaseDTO):
     created_at: datetime
 
     account_id: UUID
-    state: BalanceStateChange
+    state: BalanceChangeState
+    state_raw: BalanceChangeState
     balance: float
     balance_diff: float
 
 
 class NewBalanceChangeRequest(BaseDTO):
     account_name: str
-    state: BalanceStateChange
+    state: BalanceChangeState
     balance: float

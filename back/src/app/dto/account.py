@@ -7,5 +7,6 @@ from app.dto.base import BaseDTO
 class AccountResponse(BaseDTO):
     id: UUID
     name: str
-    current_balance: float
+    balance: float
     last_balance_update: datetime
+    is_balance_fixed: bool

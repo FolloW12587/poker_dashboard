@@ -21,7 +21,7 @@ class LogType(str, Enum):
 class LogConfig(BaseModel):
     name: str = "app"
     level: str = "INFO"
-    type: LogType = LogType.FILE
+    type: LogType = LogType.CONSOLE
 
 
 class ServerConfig(BaseModel):
